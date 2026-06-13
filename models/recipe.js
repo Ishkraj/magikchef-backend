@@ -50,14 +50,14 @@ const recipeSchema = new mongoose.Schema({
   },
   author: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'user' 
+    ref: 'User' 
   },
   likes: [{ 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'user' 
+    ref: 'User' 
   }],
   comments: [{
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     text: { type: String, required: true },
     rating: { type: Number, default: 5 },
     date: { type: Date, default: Date.now }
