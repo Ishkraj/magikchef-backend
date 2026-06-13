@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // ⚠️ Dhyan rakhna model/User.js me 'username' add kar liya ho!
+const User = require('../models/user'); // ⚠️ Dhyan rakhna model/User.js me 'username' add kar liya ho!
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
     let user = await User.findOne({ $or: [{ email }, { username }] });
     
     if (user && user.isVerified) {
-      return res.status(400).json({ msg: 'Username ya Email pehle se use ho chuka hai' });
+      return res.status(400).json({ msg: 'The username or email is already in use' });
     }
 
     // Agar user verify nahi hai, toh purana delete karke naya banao
@@ -104,7 +104,7 @@ router.post('/login', async (req, res) => {
       $or: [{ email: identifier }, { username: identifier }] 
     });
     
-    if (!user) return res.status(400).json({ msg: 'User nahi mila bhai!' });
+    if (!user) return res.status(400).json({ msg: 'User not found!' });
     if (!user.isVerified) return res.status(400).json({ msg: 'Please verify your email first' });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -127,7 +127,7 @@ router.post('/forgot-password', async (req, res) => {
       $or: [{ email: identifier }, { username: identifier }] 
     });
 
-    if (!user) return res.status(404).json({ msg: "Account nahi mila." });
+    if (!user) return res.status(404).json({ msg: "Account not found." });
 
     const otp = randomstring.generate({ length: 6, charset: 'numeric' });
     user.otp = otp;
@@ -142,7 +142,7 @@ router.post('/forgot-password', async (req, res) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) return res.status(500).json({ msg: 'Error sending email' });
-      res.json({ msg: 'Password reset OTP bhej diya gaya hai!' });
+      res.json({ msg: 'Password reset OTP sent to your email' });
     });
   } catch (err) {
     res.status(500).send('Server Error');
@@ -158,8 +158,8 @@ router.post('/reset-password', async (req, res) => {
       $or: [{ email: identifier }, { username: identifier }] 
     });
 
-    if (!user) return res.status(404).json({ msg: "Account nahi mila." });
-    if (user.otp !== otp) return res.status(400).json({ msg: "Galat OTP bhai!" });
+    if (!user) return res.status(404).json({ msg: "Account not found." });
+    if (user.otp !== otp) return res.status(400).json({ msg: "Wrong OTP!" });
 
     // Naya password hash karo
     const salt = await bcrypt.genSalt(10);
@@ -167,7 +167,7 @@ router.post('/reset-password', async (req, res) => {
     user.otp = null; // OTP use ho gaya toh delete kar do
     await user.save();
 
-    res.json({ msg: "Password successfuly update ho gaya! 🚀" });
+    res.json({ msg: "Password is Update successfuly!" });
   } catch (err) {
     res.status(500).send('Server Error');
   }

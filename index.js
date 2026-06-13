@@ -205,7 +205,7 @@ app.post('/api/follow/:targetUserId', async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const myId = decoded.id || decoded._id || decoded.userId || (decoded.user && decoded.user.id);
     
-    const User = mongoose.model('User');
+    const User = mongoose.model('user');
     const currentUser = await User.findById(myId); 
     const targetUser = await User.findById(req.params.targetUserId);
 

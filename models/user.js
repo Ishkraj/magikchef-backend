@@ -24,10 +24,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false, // Jab tak OTP verify nahi hoga, ye false rahega
   },
-  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }]
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('user', userSchema);
 module.exports = User;
 
