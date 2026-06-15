@@ -6,6 +6,7 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 require('dotenv').config();
+console.log("🚨 CHECKING ENV:", process.env.MONGO_URI ? "Bhai Link Mil Gaya ✅" : "Link GAYAB Hai ❌");
 
 const Recipe = require('./models/recipe'); 
 
