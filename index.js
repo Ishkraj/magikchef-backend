@@ -6,7 +6,7 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 require('dotenv').config();
-console.log("🚨 CHECKING ENV:", process.env.MONGO_URI ? "Bhai Link Mil Gaya ✅" : "Link GAYAB Hai ❌");
+
 
 const Recipe = require('./models/recipe'); 
 
@@ -17,8 +17,7 @@ const PORT = process.env.PORT || 5000;
 // 👇 MIDDLEWARE (Ye SABSE PEHLE aana chahiye)
 // ===========================================
 app.use(cors({
-  origin: ["https://magikchef-official.vercel.app", "https://magikchef.vercel.app"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: true, // Yeh automatic har URL (chahe localhost ho ya Vercel) ko allow kar dega
   credentials: true
 }));
 app.use(express.json()); 
