@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 5000;
 // 👇 MIDDLEWARE (Ye SABSE PEHLE aana chahiye)
 // ===========================================
 app.use(cors({
-  origin: ["https://magikchef-official.vercel.app", "https://magikchef.vercel.app", "http://localhost:5173"],
+  origin: ["https://magikchef-official.vercel.app", "https://magikchef.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
