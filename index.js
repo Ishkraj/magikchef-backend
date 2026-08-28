@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 5000;
 // 👇 MIDDLEWARE (Ye SABSE PEHLE aana chahiye)
 // ===========================================
 app.use(cors({
-  origin: ["https://magikchef-official.vercel.app", "https://magikchef.vercel.app"],
+  origin: ["https://magikchef-official.vercel.app", "https://magikchef.vercel.app", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -122,7 +122,7 @@ app.post('/api/recipes', (req, res) => {
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// AI MAGIC ROUTE 🪄
+// AI MAGIC ROUTE 
 app.post('/api/ai/magic-recipe', async (req, res) => {
   try {
     const { ingredients, servings } = req.body;
@@ -160,6 +160,51 @@ app.post('/api/ai/magic-recipe', async (req, res) => {
   } catch (err) {
     console.error("AI Error:", err);
     res.status(500).json({ msg: "AI fail ho gaya bhai", error: err.message });
+  }
+});
+
+// ==========================================
+// 🎙️ AI VOICE AGENT ROUTE (MagikChef JARVIS)
+// ==========================================
+app.post('/api/ai/voice-agent', async (req, res) => {
+  try {
+    const { message } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ msg: "Bhai kuch toh bolo!" });
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    // gemini-1.5-flash sabse fast hai real-time voice ke liye
+    const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" }); 
+
+    const prompt = `You are an energetic and smart AI cooking assistant inside the 'MagikChef' app.
+    The user just said: "${message}"
+
+    Respond in Hinglish (Hindi written in English alphabet) with a very friendly tone. 
+    Keep the response VERY SHORT (1-2 sentences max) because it will be spoken out loud by a voice engine. 
+
+    If the user mentions they want to cook something or eat something (e.g., paneer, maggi, cake, breakfast), extract that main ingredient/dish and put it in 'searchQuery'. If it's just a general chat (like "hello"), leave 'searchQuery' empty.
+
+    Return ONLY a raw JSON object (without markdown blocks like \`\`\`json) with this exact structure:
+    {
+      "reply": "Your short spoken hinglish response here",
+      "searchQuery": "keyword to search or empty string"
+    }`;
+
+    const result = await model.generateContent(prompt);
+    let responseText = result.response.text();
+    
+    // In case AI adds markdown by mistake, we clean it
+    responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+    
+    const data = JSON.parse(responseText);
+
+    res.json({ msg: "Agent responded! 🤖", data });
+
+  } catch (err) {
+    console.error("Voice Agent Error:", err);
+    res.status(500).json({ msg: "Voice Agent server error", error: err.message });
   }
 });
 // ==========================================

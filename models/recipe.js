@@ -41,7 +41,7 @@ const recipeSchema = new mongoose.Schema({
     required: true
   },
   diet: { 
-    type: String 
+    type: String
   },
   rating: {
     type: Number,
