@@ -179,19 +179,19 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" }); 
 
     const prompt = `You are an energetic and smart AI cooking assistant inside the 'MagikChef' app.
-    The user just said: "${message}"
+    The user's message/query is: "${message}"
 
-    Respond in Hinglish (Hindi written in English alphabet) with a very friendly tone. 
-    Keep the response VERY SHORT (1-2 sentences max) because it will be spoken out loud by a voice engine. 
+    INSTRUCTIONS:
+    1. Respond in Hinglish (Hindi written in English alphabet) with a very friendly tone. Keep it SHORT (1-2 sentences max).
+    2. CHECK if the message contains a recipe context (e.g., "Context from current recipe page: ..."). 
+    3. IF context is provided, you MUST read out the exact ingredients listed in that context instead of making up your own. Make it sound natural for voice output.
+    4. IF the user wants to search a new dish, put it in 'searchQuery'. Otherwise leave it empty.
 
-    If the user mentions they want to cook something or eat something (e.g., paneer, maggi, cake, breakfast), extract that main ingredient/dish and put it in 'searchQuery'. If it's just a general chat (like "hello"), leave 'searchQuery' empty.
-
-    Return ONLY a raw JSON object (without markdown blocks like \`\`\`json) with this exact structure:
+    Return ONLY a raw JSON object with this exact structure:
     {
       "reply": "Your short spoken hinglish response here",
       "searchQuery": "keyword to search or empty string"
     }`;
-
     const result = await model.generateContent(prompt);
     let responseText = result.response.text();
     
