@@ -175,7 +175,7 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" }); 
+    const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" }); 
 
     const prompt = `You are an energetic and smart AI cooking assistant inside the 'MagikChef' app.
     The user's message/query is: "${message}"
