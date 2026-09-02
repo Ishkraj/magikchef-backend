@@ -175,7 +175,6 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // gemini-2.5-flash sabse fast hai real-time voice ke liye
     const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" }); 
 
     const prompt = `You are an energetic and smart AI cooking assistant inside the 'MagikChef' app.
@@ -184,47 +183,46 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     INSTRUCTIONS:
     1. Respond in Hinglish (Hindi written in English alphabet) with a very friendly tone. Keep it SHORT (1-2 sentences max).
     2. CHECK if the message contains a recipe context (e.g., "Context from current recipe page: ..."). 
-    3. IF context is provided, you MUST read out the exact ingredients listed in that context instead of making up your own. Make it sound natural for voice output.
+    3. IF context is provided, you MUST read out the exact ingredients listed in that context instead of making up your own.
     4. IF the user wants to search a new dish, put it in 'searchQuery'. Otherwise leave it empty.
 
-    Return ONLY a raw JSON object with this exact structure:
+    Return ONLY a raw JSON object:
     {
       "reply": "Your short spoken hinglish response here",
       "searchQuery": "keyword to search or empty string"
     }`;
+
+    // Agar Gemini API hang ho jaye, toh hum yahan timeout bhi set kar sakte hain (par abhi try-catch bacha lega)
     const result = await model.generateContent(prompt);
     let responseText = result.response.text();
     
     let data;
     try {
-      // 🔥 BULLETPROOF PARSING: AI ka extra kachra (markdown/text) saaf karo
       let cleanedText = responseText.replace(/```(json)?/gi, '').trim();
-      
       const startIndex = cleanedText.indexOf('{');
       const endIndex = cleanedText.lastIndexOf('}');
-      
       if (startIndex !== -1 && endIndex !== -1) {
           cleanedText = cleanedText.substring(startIndex, endIndex + 1);
       }
-      
       data = JSON.parse(cleanedText);
-      
     } catch (parseError) {
       console.error("AI JSON Parse Error:", parseError);
-      console.error("Raw AI Text:", responseText); 
-      
-      // Agar JSON fass jaye, toh 500 error rokne ke liye default data bhej do
-      data = {
-          reply: "Bhai, mujhe theek se samajh nahi aaya. Kya aap wapas bol sakte ho?",
-          searchQuery: ""
-      };
+      data = { reply: "Sorry chef, main recipe theek se padh nahi payi. Ek baar phir try karein?", searchQuery: "" };
     }
 
     res.json({ msg: "Agent responded! 🤖", data });
 
   } catch (err) {
-    console.error("Voice Agent Error:", err);
-    res.status(500).json({ msg: "Voice Agent server error", error: err.message });
+    console.error("🚨 MAJOR BACKEND CRASH (Gemini API / System):", err);
+    
+    // 🔥 YAHAN FIX HAI: Ab server 500 phenkne ki jagah safe 200 response dega
+    res.json({ 
+      msg: "Handled gracefully", 
+      data: {
+        reply: "Server par thoda load hai ya Vercel time out ho gaya. Vercel ke logs check karo bhai!",
+        searchQuery: ""
+      }
+    });
   }
 });
 // ==========================================
