@@ -175,7 +175,7 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // gemini-1.5-flash sabse fast hai real-time voice ke liye
+    // gemini-2.5-flash sabse fast hai real-time voice ke liye
     const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" }); 
 
     const prompt = `You are an energetic and smart AI cooking assistant inside the 'MagikChef' app.
@@ -195,10 +195,30 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     const result = await model.generateContent(prompt);
     let responseText = result.response.text();
     
-    // In case AI adds markdown by mistake, we clean it
-    responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    const data = JSON.parse(responseText);
+    let data;
+    try {
+      // 🔥 BULLETPROOF PARSING: AI ka extra kachra (markdown/text) saaf karo
+      let cleanedText = responseText.replace(/```(json)?/gi, '').trim();
+      
+      const startIndex = cleanedText.indexOf('{');
+      const endIndex = cleanedText.lastIndexOf('}');
+      
+      if (startIndex !== -1 && endIndex !== -1) {
+          cleanedText = cleanedText.substring(startIndex, endIndex + 1);
+      }
+      
+      data = JSON.parse(cleanedText);
+      
+    } catch (parseError) {
+      console.error("AI JSON Parse Error:", parseError);
+      console.error("Raw AI Text:", responseText); 
+      
+      // Agar JSON fass jaye, toh 500 error rokne ke liye default data bhej do
+      data = {
+          reply: "Bhai, mujhe theek se samajh nahi aaya. Kya aap wapas bol sakte ho?",
+          searchQuery: ""
+      };
+    }
 
     res.json({ msg: "Agent responded! 🤖", data });
 
