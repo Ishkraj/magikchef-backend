@@ -213,11 +213,13 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     res.json({ msg: "Agent responded! 🤖", data });
 
   } catch (err) {
-    console.error("🚨 ASLI ERROR:", err.message); // 👈 err ki jagah err.message print karayein
+    console.error("🚨 MAJOR BACKEND CRASH (Gemini API / System):", err);
+    
+    // 🔥 YAHAN FIX HAI: Ab server 500 phenkne ki jagah safe 200 response dega
     res.json({ 
-      msg: "Error", 
+      msg: "Handled gracefully", 
       data: {
-        reply: `Error: ${err.message}`, // Frontend par bhi error dikh jayegi
+        reply: "Server error... try again later",
         searchQuery: ""
       }
     });
