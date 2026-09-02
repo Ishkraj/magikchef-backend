@@ -175,7 +175,7 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" }); 
+    const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" }); 
 
     const prompt = `You are an energetic and smart AI cooking assistant inside the 'MagikChef' app.
     The user's message/query is: "${message}"
@@ -213,13 +213,11 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     res.json({ msg: "Agent responded! 🤖", data });
 
   } catch (err) {
-    console.error("🚨 MAJOR BACKEND CRASH (Gemini API / System):", err);
-    
-    // 🔥 YAHAN FIX HAI: Ab server 500 phenkne ki jagah safe 200 response dega
+    console.error("🚨 ASLI ERROR:", err.message); // 👈 err ki jagah err.message print karayein
     res.json({ 
-      msg: "Handled gracefully", 
+      msg: "Error", 
       data: {
-        reply: "Server par thoda load hai ya Vercel time out ho gaya. Vercel ke logs check karo bhai!",
+        reply: `Error: ${err.message}`, // Frontend par bhi error dikh jayegi
         searchQuery: ""
       }
     });
