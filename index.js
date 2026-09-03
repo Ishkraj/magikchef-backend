@@ -138,7 +138,7 @@ app.post('/api/ai/magic-recipe', async (req, res) => {
 
     // Abhi ke liye ek safe default try kar rahe hain
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" }); 
+    const model = genAI.getGenerativeModel({ model: "models/gemini-3.6-flash" }); 
 
     // 🧠 PROMPT ENGINEERING UPDATE (Ingredients ko Objects bana diya)
     const prompt = `You are an expert Indian chef. I have these ingredients: ${ingredients}.
@@ -176,7 +176,7 @@ app.post('/api/ai/voice-agent', async (req, res) => {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     // 🚨 IMPORTANT FIX: Google ka sahi aur fastest model ab 'gemini-2.5-flash' hai
-    const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" }); 
+    const model = genAI.getGenerativeModel({ model: "models/gemini-3.6-flash" }); 
 
     const prompt = `You are 'Miko', an energetic, smart, and funny AI cooking assistant inside the 'MagikChef' app.
     The user just said: "${message}"
