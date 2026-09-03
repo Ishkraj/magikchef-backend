@@ -222,7 +222,7 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     res.json({ 
       msg: "Handled gracefully", 
       data: {
-        reply: "API limit exceeded",
+        reply: "your free limit plan exceeded, please try again later...",
         searchQuery: ""
       }
     });
