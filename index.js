@@ -175,29 +175,32 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    // 🚨 IMPORTANT FIX: Google ka sahi aur fastest model ab 'gemini-2.5-flash' hai
     const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" }); 
 
-    const prompt = `You are an energetic and smart AI cooking assistant inside the 'MagikChef' app.
-    The user's message/query is: "${message}"
+    const prompt = `You are 'Miko', an energetic, smart, and funny AI cooking assistant inside the 'MagikChef' app.
+    The user just said: "${message}"
 
-    INSTRUCTIONS:
-    1. Respond in Hinglish (Hindi written in English alphabet) with a very friendly tone. Keep it SHORT (1-2 sentences max).
-    2. CHECK if the message contains a recipe context (e.g., "Context from current recipe page: ..."). 
-    3. IF context is provided, you MUST read out the exact ingredients listed in that context instead of making up your own.
-    4. IF the user wants to search a new dish, put it in 'searchQuery'. Otherwise leave it empty.
+    INSTRUCTIONS & PERSONA:
+    1. Language & Tone: STRICTLY respond in Hinglish (Hindi written in English alphabet). Be very friendly, enthusiastic, and keep it SHORT (1-3 sentences max).
+    2. Smart Search (Home Page): If the user says they want to eat/cook a specific dish (e.g., "matar paneer khana hai"), put that dish name in 'searchQuery'. Reply with: "Ye rahe kuch tareeqe aur recipes, aapko jo achha lage uspar click kariye, phir hum aage badhenge!"
+    3. Step-by-Step Ingredients (Recipe Page): If the context says Recipe Page and the user asks for ingredients, DO NOT read all of them at once. Read only the first 2-3 ingredients and ask: "Aapne ye nikal liya? Haan bolo toh aage badhti hoon." 
+    4. Continuing Steps: If the user says "haan", "yes", or "aage batao", look at the recipe context and read the next few ingredients organically. 
+    5. Jokes: If the user asks for a joke or gets bored, tell a short, funny food-related joke in Hinglish.
+    6. General Chat: For anything else, just be a helpful, conversational chef. Leave 'searchQuery' empty unless they explicitly want to find a dish.
 
-    Return ONLY a raw JSON object:
+    Return ONLY a raw JSON object with no extra markdown formatting:
     {
       "reply": "Your short spoken hinglish response here",
       "searchQuery": "keyword to search or empty string"
     }`;
 
-    // Agar Gemini API hang ho jaye, toh hum yahan timeout bhi set kar sakte hain (par abhi try-catch bacha lega)
     const result = await model.generateContent(prompt);
     let responseText = result.response.text();
     
     let data;
     try {
+      // 🔥 BULLETPROOF PARSING
       let cleanedText = responseText.replace(/```(json)?/gi, '').trim();
       const startIndex = cleanedText.indexOf('{');
       const endIndex = cleanedText.lastIndexOf('}');
@@ -207,7 +210,7 @@ app.post('/api/ai/voice-agent', async (req, res) => {
       data = JSON.parse(cleanedText);
     } catch (parseError) {
       console.error("AI JSON Parse Error:", parseError);
-      data = { reply: "Sorry chef, main recipe theek se padh nahi payi. Ek baar phir try karein?", searchQuery: "" };
+      data = { reply: "Sorry chef, main theek se sun nahi payi. Ek baar phir bataoge?", searchQuery: "" };
     }
 
     res.json({ msg: "Agent responded! 🤖", data });
@@ -215,11 +218,11 @@ app.post('/api/ai/voice-agent', async (req, res) => {
   } catch (err) {
     console.error("🚨 MAJOR BACKEND CRASH (Gemini API / System):", err);
     
-    // 🔥 YAHAN FIX HAI: Ab server 500 phenkne ki jagah safe 200 response dega
+    // Server crash hone se bachega aur error graceful handle hogi
     res.json({ 
       msg: "Handled gracefully", 
       data: {
-        reply: "Server error... try again later",
+        reply: "API limit exceeded",
         searchQuery: ""
       }
     });
