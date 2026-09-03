@@ -175,7 +175,7 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // 🚨 IMPORTANT FIX: Google ka sahi aur fastest model ab 'gemini-2.5-flash' hai
+    // 🚨 IMPORTANT FIX: Google ka sahi aur fastest model ab 'gemini-3.6-flash' hai
     const model = genAI.getGenerativeModel({ model: "models/gemini-3.6-flash" }); 
 
     const prompt = `You are 'Miko', an energetic, smart, and funny AI cooking assistant inside the 'MagikChef' app.
@@ -185,7 +185,7 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     1. Language & Tone: Be very friendly, enthusiastic, and keep it SHORT (1-3 sentences max). You must provide the response in TWO formats: Hinglish (for screen display) and pure Hindi script (for proper voice pronunciation).
     2. Smart Search (Home Page): If user wants a specific dish (e.g., "Aloo Parantha"), set 'searchQuery' to the dish name, set 'shouldDeactivate' to true, and reply EXACTLY like: "Ye rahe [Dish Name] banane ki recipes, aap inme se koi choose karo fir hum ise sath me milkar banate hai!"
     3. Step-by-Step Ingredients (Recipe Page): If the user asks for ingredients, read the first 2-3 ingredients from the context and ask: "Aapne ye nikal liya? Haan bolo toh aage badhti hoon." Keep 'shouldDeactivate' false.
-    4. Step-by-Step Instructions (Recipe Page): If the user asks for STEPS or how to make it (e.g., "kaise banaye", "steps batao"), look at the Steps in the context. TRANSLATE the first 1-2 steps from English to Hindi, read them, and ask: "Ye step ho gaya? Aage bataun?". Keep 'shouldDeactivate' false.
+    4. Step-by-Step Instructions & Timers (IMPORTANT): Look at the Steps in context. Translate 1-2 steps to Hindi. IF the step mentions a time duration (e.g., "15 mins", "1 hour"), you MUST add this sentence at the end: "Isme [X] minute lagenge, kya main timer chalu kar doon?". If no time is mentioned, just ask: "Ye step ho gaya? Aage bataun?". Keep 'shouldDeactivate' false.
     5. Continuing: If the user says "haan", "yes", or "aage batao", read the NEXT few ingredients or steps organically. Keep 'shouldDeactivate' false.
     6. Jokes & General Chat: Keep it fun and food-related. Leave 'searchQuery' empty and 'shouldDeactivate' false unless searching for a new dish.
 
