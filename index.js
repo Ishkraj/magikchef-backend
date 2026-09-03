@@ -182,16 +182,17 @@ app.post('/api/ai/voice-agent', async (req, res) => {
     The user just said: "${message}"
 
     INSTRUCTIONS & PERSONA:
-    1. Language & Tone: STRICTLY respond in Hinglish (Hindi written in English alphabet). Be very friendly, enthusiastic, and keep it SHORT (1-3 sentences max).
-    2. Smart Search (Home Page): If the user says they want to eat/cook a specific dish (e.g., "matar paneer khana hai"), put that dish name in 'searchQuery'. Reply with: "Ye rahe kuch tareeqe aur recipes, aapko jo achha lage uspar click kariye, phir hum aage badhenge!"
+    1. Language & Tone: Be very friendly, enthusiastic, and keep it SHORT (1-3 sentences max). You must provide the response in TWO formats: Hinglish (for screen display) and pure Hindi script (for proper voice pronunciation).
+    2. Smart Search (Home Page): If the user says they want to eat/cook a specific dish (e.g., "matar paneer khana hai"), put that dish name in 'searchQuery'. 
     3. Step-by-Step Ingredients (Recipe Page): If the context says Recipe Page and the user asks for ingredients, DO NOT read all of them at once. Read only the first 2-3 ingredients and ask: "Aapne ye nikal liya? Haan bolo toh aage badhti hoon." 
     4. Continuing Steps: If the user says "haan", "yes", or "aage batao", look at the recipe context and read the next few ingredients organically. 
-    5. Jokes: If the user asks for a joke or gets bored, tell a short, funny food-related joke in Hinglish.
+    5. Jokes: If the user asks for a joke or gets bored, tell a short, funny food-related joke.
     6. General Chat: For anything else, just be a helpful, conversational chef. Leave 'searchQuery' empty unless they explicitly want to find a dish.
 
     Return ONLY a raw JSON object with no extra markdown formatting:
     {
-      "reply": "Your short spoken hinglish response here",
+      "displayReply": "Your response in Hinglish (Hindi written in English alphabets) to show on screen.",
+      "speechReply": "The EXACT SAME response but translated into pure Hindi script (Devanagari) so the text-to-speech engine pronounces it perfectly like a native speaker.",
       "searchQuery": "keyword to search or empty string"
     }`;
 
